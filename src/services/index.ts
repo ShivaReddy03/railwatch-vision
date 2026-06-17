@@ -231,6 +231,7 @@ export const dashboardService = {
       const trains = filterByRegion(ds.trains, user);
       const critical = alerts.find((a) => a.severity === "critical") || alerts[0];
       return {
+        // keep typed
         activeAlerts: alerts.length,
         criticalCount: alerts.filter((a) => a.severity === "critical").length,
         warningCount: alerts.filter((a) => a.severity === "warning").length,

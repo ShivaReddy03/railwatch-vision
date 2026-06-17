@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 import type { NodeStatus } from "@/types";
 
-interface Props { status: NodeStatus | "active" | "acknowledged" | "resolved" | "safe" | "monitor" | "at_risk" | "delayed" | "on_time" | "online" | "offline"; label?: string }
+type AnyStatus = NodeStatus | "active" | "acknowledged" | "resolved" | "safe" | "monitor" | "at_risk" | "delayed" | "on_time" | "online" | "offline" | "info";
+interface Props { status: AnyStatus; label?: string }
 
 const MAP: Record<string, string> = {
   normal: "bg-success-soft",
@@ -16,6 +17,7 @@ const MAP: Record<string, string> = {
   monitor: "bg-warning-soft",
   at_risk: "bg-critical-soft",
   on_time: "bg-success-soft",
+  info: "bg-info-soft",
   delayed: "bg-warning-soft",
 };
 

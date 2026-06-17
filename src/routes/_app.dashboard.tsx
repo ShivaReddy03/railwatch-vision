@@ -93,7 +93,7 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {data?.affectedTrains?.map((t) => (
+              {data?.affectedTrains?.map((t: import("@/types").Train) => (
                 <tr key={t.id} className="border-b border-border/50">
                   <td className="py-2.5 font-medium">{t.number}</td>
                   <td>{t.distanceFromIncidentKm} km</td>

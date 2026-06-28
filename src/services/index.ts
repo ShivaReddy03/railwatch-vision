@@ -245,11 +245,11 @@ export const dashboardService = {
       const alerts = filterByRegion(ds.alerts, user).filter((a) => a.status === "active");
       const nodes = filterByRegion(ds.nodes, user);
       const trains = filterByRegion(ds.trains, user);
-      const critical = alerts.find((a) => a.severity === "critical") || alerts[0];
+      const critical = alerts.filter((a) => a.severity === "critical");
       return {
         // keep typed
         activeAlerts: alerts.length,
-        criticalCount: alerts.filter((a) => a.severity === "critical").length,
+        criticalCount: critical.length,
         warningCount: alerts.filter((a) => a.severity === "warning").length,
         totalNodes: nodes.length,
         onlineNodes: nodes.filter((n) => n.status !== "offline").length,

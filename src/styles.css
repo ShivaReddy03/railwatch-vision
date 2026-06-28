@@ -139,3 +139,5 @@
 @utility glow-primary {
   box-shadow: 0 0 0 1px oklch(0.55 0.16 245 / 0.4), 0 0 40px -10px oklch(0.55 0.16 245 / 0.5);
 }
+
+.carousel-progress { stroke-dasharray: 25 75; stroke-dashoffset: 100; animation: carousel-trail 10s linear forwards; } .group:hover .carousel-progress { animation-play-state: paused; } @keyframes carousel-trail { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }

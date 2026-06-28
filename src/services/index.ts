@@ -94,7 +94,23 @@ export const alertsService = {
     const { data } = await apiClient.get("/alerts/summary");
     return data as { active: number; critical: number; warning: number; info: number; total: number };
   },
+  async acknowledge(id: string): Promise<{ message: string }> {
+    if (USE_MOCK) { await delay(150); return { message: "Alert acknowledged" }; }
+    const { data } = await apiClient.post<{ message: string }>(`/alerts/${id}/acknowledge`);
+    return data;
+  },
+  async escalate(id: string, note: string): Promise<{ message: string; note: string }> {
+    if (USE_MOCK) { await delay(150); return { message: "Alert escalated", note }; }
+    const { data } = await apiClient.post<{ message: string; note: string }>(`/alerts/${id}/escalate`, { note });
+    return data;
+  },
+  async exportAlert(id: string, format: "pdf" | "csv" = "pdf"): Promise<{ message: string }> {
+    if (USE_MOCK) { await delay(150); return { message: `Export placeholder for ${id} as ${format}` }; }
+    const { data } = await apiClient.get<{ message: string }>(`/alerts/${id}/export`, { params: { format } });
+    return data;
+  },
 };
+
 
 // ---------------- TRAINS ----------------
 export const trainService = {

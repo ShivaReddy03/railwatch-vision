@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
-import { useAlerts, useAlertsSummary } from "@/hooks";
+import { useAlerts, useAlertsSummary, useAcknowledgeAlert, useEscalateAlert, useExportAlert } from "@/hooks";
+import { toast } from "sonner";
 import { StatCard } from "@/components/cards/StatCard";
 import { AlertTriangle, AlertCircle, Info, Bell, Search, Filter, Download, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,9 @@ function AlertsPage() {
 
   const { data: summary } = useAlertsSummary();
   const { data, isLoading } = useAlerts({ page, pageSize: 10, search, severity, status });
+  const ack = useAcknowledgeAlert();
+  const escalate = useEscalateAlert();
+  const exportAlert = useExportAlert();
 
   return (
     <AppShell title="Alerts" subtitle="Monitor and manage all system alerts">
@@ -120,9 +124,41 @@ function AlertsPage() {
                   <Field label="Distance" value={`${selected.distanceKm} km`} />
                 </div>
                 <div className="flex gap-2 pt-3 border-t border-border">
-                  <Button className="flex-1">Acknowledge</Button>
-                  <Button variant="outline" className="flex-1">Escalate</Button>
-                  <Button variant="outline">Export</Button>
+                  <Button
+                    className="flex-1"
+                    disabled={ack.isPending}
+                    onClick={() => ack.mutate(selected.id, {
+                      onSuccess: (r) => { toast.success(r.message); setSelected(null); },
+                      onError: () => toast.error("Failed to acknowledge"),
+                    })}
+                  >
+                    {ack.isPending ? "Acknowledging..." : "Acknowledge"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    disabled={escalate.isPending}
+                    onClick={() => {
+                      const note = window.prompt("Escalation note:") || "";
+                      if (!note) return;
+                      escalate.mutate({ id: selected.id, note }, {
+                        onSuccess: (r) => { toast.success(r.message); setSelected(null); },
+                        onError: () => toast.error("Failed to escalate"),
+                      });
+                    }}
+                  >
+                    Escalate
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={exportAlert.isPending}
+                    onClick={() => exportAlert.mutate({ id: selected.id, format: "pdf" }, {
+                      onSuccess: (r) => toast.success(r.message),
+                      onError: () => toast.error("Failed to export"),
+                    })}
+                  >
+                    Export
+                  </Button>
                 </div>
               </div>
             </>

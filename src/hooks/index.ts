@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { alertsService, trainService, nodeService, deviceService, reportsService, analyticsService, dashboardService, incidentService } from "@/services";
 
 export function useDashboard() {
@@ -12,6 +12,31 @@ export function useAlertsSummary() {
 }
 export function useAlert(id: string | undefined) {
   return useQuery({ queryKey: ["alert", id], queryFn: () => alertsService.getById(id!), enabled: !!id });
+}
+export function useAcknowledgeAlert() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => alertsService.acknowledge(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+export function useEscalateAlert() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, note }: { id: string; note: string }) => alertsService.escalate(id, note),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+export function useExportAlert() {
+  return useMutation({
+    mutationFn: ({ id, format }: { id: string; format?: "pdf" | "csv" }) => alertsService.exportAlert(id, format),
+  });
 }
 export function useTrains(params: Parameters<typeof trainService.list>[0] = {}) {
   return useQuery({ queryKey: ["trains", params], queryFn: () => trainService.list(params), refetchInterval: 20000 });

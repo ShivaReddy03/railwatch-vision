@@ -245,7 +245,7 @@ export const dashboardService = {
       const alerts = filterByRegion(ds.alerts, user).filter((a) => a.status === "active");
       const nodes = filterByRegion(ds.nodes, user);
       const trains = filterByRegion(ds.trains, user);
-      const critical = alerts.filter((a) => a.severity === "critical");
+      const critical = alerts.filter((a) => a.severity === "critical" || a.severity === "warning");
       return {
         // keep typed
         activeAlerts: alerts.length,

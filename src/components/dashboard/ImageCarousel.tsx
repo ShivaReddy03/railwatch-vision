@@ -29,15 +29,31 @@ export function ImageCarousel({ alerts }: { alerts: any[] }) {
   const alert = alerts[currentIndex];
   const hasMultiple = alerts.length > 1;
 
+  const toneConfig = {
+    critical: {
+      svgStroke: "var(--color-critical)",
+      badgeBg: "bg-critical/90",
+      badgeText: "text-critical-foreground",
+      border: "border-critical/30",
+    },
+    warning: {
+      svgStroke: "var(--color-warning)",
+      badgeBg: "bg-warning/90",
+      badgeText: "text-warning-foreground",
+      border: "border-warning/30",
+    },
+  };
+  const style = toneConfig[alert.severity as keyof typeof toneConfig] || toneConfig.critical;
+
   return (
-    <div className="relative glass-card rounded-xl overflow-hidden h-full min-h-[360px] flex flex-col group">
+    <div className={`relative glass-card rounded-xl overflow-hidden h-full min-h-[360px] flex flex-col group ${style.border}`}>
       {hasMultiple && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
           <rect
             x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)"
             rx="11" ry="11"
             fill="none"
-            stroke="var(--color-critical)"
+            stroke={style.svgStroke}
             strokeWidth="2"
             opacity="0.15"
           />
@@ -46,7 +62,7 @@ export function ImageCarousel({ alerts }: { alerts: any[] }) {
             x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)"
             rx="11" ry="11"
             fill="none"
-            stroke="var(--color-critical)"
+            stroke={style.svgStroke}
             strokeWidth="2"
             pathLength="100"
             className="carousel-progress"
@@ -87,7 +103,7 @@ export function ImageCarousel({ alerts }: { alerts: any[] }) {
             >
               <div className="relative rounded-lg overflow-hidden border border-border flex-1 bg-black/20">
                 <img src={alert.imageUrl || detectionImg} alt={`Detected ${alert.objectCategory}`} className="w-full h-full object-cover absolute inset-0" />
-                <div className="absolute top-3 left-3 px-2 py-0.5 rounded bg-critical/90 text-critical-foreground text-xs font-bold">{alert.objectCategory} {alert.confidence}%</div>
+                <div className={`absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-bold ${style.badgeBg} ${style.badgeText}`}>{alert.objectCategory} {alert.confidence}%</div>
               </div>
               <div className="grid grid-cols-4 gap-2 mt-4 text-xs">
                 <Detail label="Object" value={alert.objectCategory || "—"} />

@@ -31,15 +31,40 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
   const alert = alerts[currentIndex];
   const hasMultiple = alerts.length > 1;
 
+  const toneConfig = {
+    critical: {
+      border: "border-critical/40",
+      svgStroke: "var(--color-critical)",
+      bgSoft: "bg-critical/15",
+      borderSoft: "border-critical/30",
+      text: "text-critical",
+      bgSolid: "bg-critical hover:bg-critical/90",
+      textSolid: "text-critical-foreground",
+      title: "Critical Incident"
+    },
+    warning: {
+      border: "border-warning/40",
+      svgStroke: "var(--color-warning)",
+      bgSoft: "bg-warning/15",
+      borderSoft: "border-warning/30",
+      text: "text-warning",
+      bgSolid: "bg-warning hover:bg-warning/90",
+      textSolid: "text-warning-foreground",
+      title: "Warning Incident"
+    }
+  };
+
+  const style = toneConfig[alert.severity as keyof typeof toneConfig] || toneConfig.critical;
+
   return (
-    <div className="relative glass-card rounded-xl border-critical/40 overflow-hidden h-full min-h-[360px] flex flex-col group">
+    <div className={`relative glass-card rounded-xl overflow-hidden h-full min-h-[360px] flex flex-col group ${style.border}`}>
       {hasMultiple && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
           <rect
             x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)"
             rx="11" ry="11"
             fill="none"
-            stroke="var(--color-critical)"
+            stroke={style.svgStroke}
             strokeWidth="2"
             opacity="0.15"
           />
@@ -48,7 +73,7 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
             x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)"
             rx="11" ry="11"
             fill="none"
-            stroke="var(--color-critical)"
+            stroke={style.svgStroke}
             strokeWidth="2"
             pathLength="100"
             className="carousel-progress"
@@ -73,8 +98,8 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
 
       <div className="p-5 flex-1 flex flex-col relative z-10 h-full">
         <div className="flex items-center gap-3 h-6">
-          <div className="text-xs uppercase tracking-wider text-critical font-semibold">Critical Incident</div>
-          <StatusBadge status="critical" />
+          <div className={`text-xs uppercase tracking-wider font-semibold ${style.text}`}>{style.title}</div>
+          <StatusBadge status={alert.severity} />
         </div>
 
         <div className="flex-1 relative mt-4">
@@ -88,8 +113,8 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
               className="absolute inset-0 flex flex-col"
             >
               <div className="flex items-start gap-4">
-                <div className="size-14 rounded-full bg-critical/15 border border-critical/30 grid place-items-center shrink-0">
-                  <AlertTriangle className="size-7 text-critical" />
+                <div className={`size-14 rounded-full border grid place-items-center shrink-0 ${style.bgSoft} ${style.borderSoft}`}>
+                  <AlertTriangle className={`size-7 ${style.text}`} />
                 </div>
                 <div>
                   <div className="text-xl font-bold text-foreground">{alert.objectCategory}</div>
@@ -100,8 +125,8 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
 
               <div className="grid grid-cols-3 gap-3 mt-5">
                 <Metric label="Confidence" value={`${alert.confidence}%`} />
-                <Metric label="Severity" value="Critical" tone="critical" />
-                <Metric label="Risk Score" value={`${alert.riskScore}/100`} tone="critical" />
+                <Metric label="Severity" value={alert.severity === 'critical' ? 'Critical' : 'Warning'} tone={alert.severity as any} />
+                <Metric label="Risk Score" value={`${alert.riskScore}/100`} tone={alert.severity as any} />
               </div>
 
               <div className="grid grid-cols-3 gap-3 mt-3">
@@ -111,7 +136,7 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
               </div>
 
               <div className="mt-auto pt-5">
-                <Button className="w-full bg-critical hover:bg-critical/90 text-critical-foreground">
+                <Button className={`w-full ${style.bgSolid} ${style.textSolid}`}>
                   View Full Details
                 </Button>
               </div>
@@ -123,11 +148,11 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
   );
 }
 
-function Metric({ label, value, tone }: { label: string; value: string; tone?: "critical" }) {
+function Metric({ label, value, tone }: { label: string; value: string; tone?: "critical" | "warning" }) {
   return (
     <div className="rounded-lg bg-card/50 border border-border p-3">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`text-base font-bold ${tone === "critical" ? "text-critical" : "text-foreground"}`}>{value}</div>
+      <div className={`text-base font-bold ${tone === "critical" ? "text-critical" : tone === "warning" ? "text-warning" : "text-foreground"}`}>{value}</div>
     </div>
   );
 }

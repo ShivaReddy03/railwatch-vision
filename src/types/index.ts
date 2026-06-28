@@ -60,11 +60,11 @@ export interface Train {
   to: string;
   currentLocation: string;
   destination: string;
-  speedKmh: number;
-  etaMin: number;
+  speedKmh: number | null;
+  etaMin: number | null;
   delayMin: number;
   status: TrainStatus;
-  distanceFromIncidentKm?: number;
+  distanceFromIncidentKm?: number | null;
 }
 
 export type NodeStatus = "normal" | "warning" | "critical" | "offline";

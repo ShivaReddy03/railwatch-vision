@@ -115,32 +115,10 @@ export const alertsService = {
 // ---------------- TRAINS ----------------
 export const trainService = {
   async list(params: ListParams = {}): Promise<PaginatedResponse<Train>> {
-    if (USE_MOCK) {
-      await delay(200);
-      let items = filterByRegion(getDataset().trains, authService.getCurrentUser());
-      if (params.search) {
-        const q = params.search.toLowerCase();
-        items = items.filter((t) => t.number.includes(q) || t.name.toLowerCase().includes(q));
-      }
-      if (params.status && params.status !== "all") items = items.filter((t) => t.status === params.status);
-      if (params.zone && params.zone !== "all") items = items.filter((t) => t.zone === params.zone);
-      if (params.line && params.line !== "all") items = items.filter((t) => t.line === params.line);
-      return paginate(items, params.page || 1, params.pageSize || 10);
-    }
     const { data } = await apiClient.get<PaginatedResponse<Train>>("/trains", { params });
     return data;
   },
   async summary() {
-    if (USE_MOCK) {
-      await delay(100);
-      const t = filterByRegion(getDataset().trains, authService.getCurrentUser());
-      return {
-        active: t.length,
-        delayed: t.filter((x) => x.status === "delayed").length,
-        atRisk: t.filter((x) => x.status === "at_risk").length,
-        total: t.length,
-      };
-    }
     const { data } = await apiClient.get("/trains/summary");
     return data as { active: number; delayed: number; atRisk: number; total: number };
   },
@@ -191,24 +169,10 @@ export const deviceService = {
 // ---------------- REPORTS ----------------
 export const reportsService = {
   async list(params: ListParams = {}): Promise<PaginatedResponse<Report>> {
-    if (USE_MOCK) {
-      await delay(200);
-      let items = getDataset().reports;
-      if (params.search) {
-        const q = params.search.toLowerCase();
-        items = items.filter((r) => r.name.toLowerCase().includes(q));
-      }
-      return paginate(items, params.page || 1, params.pageSize || 10);
-    }
     const { data } = await apiClient.get<PaginatedResponse<Report>>("/reports", { params });
     return data;
   },
   async summary() {
-    if (USE_MOCK) {
-      await delay(100);
-      const r = getDataset().reports;
-      return { total: r.length, scheduled: 28, manual: 100, exportedGb: 12.4 };
-    }
     const { data } = await apiClient.get("/reports/summary");
     return data as { total: number; scheduled: number; manual: number; exportedGb: number };
   },

@@ -3,6 +3,7 @@ import { Home, AlertTriangle, Train, FileText, BarChart3, HardDrive, Settings, A
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/auth/AuthContext";
 import type { Role } from "@/types";
+import logo from "../../assets/railoptic-logo.png";
 
 const ALL_ITEMS = [
   { to: "/dashboard", label: "Home", icon: Home },
@@ -39,7 +40,11 @@ export function Sidebar() {
       <div className="p-5 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
           <div className="size-9 rounded-lg bg-primary/15 grid place-items-center">
-            <TrainFront className="size-5 text-primary" />
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <div className="font-bold tracking-wide text-warning text-lg leading-none">RAILOPTIC</div>
@@ -56,11 +61,10 @@ export function Sidebar() {
             <Link
               key={it.to}
               to={it.to}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
-                active
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${active
                   ? "bg-primary/15 text-primary font-medium border border-primary/30"
                   : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              }`}
+                }`}
             >
               <Icon className="size-4" />
               <span>{it.label}</span>

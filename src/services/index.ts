@@ -12,7 +12,7 @@ function paginate<T>(items: T[], page: number, pageSize: number): PaginatedRespo
 // ---------------- AUTH ----------------
 export const authService = {
   async login(username: string, password: string, role: Role): Promise<AuthResponse> {
-    if (USE_MOCK) {
+    if (0==0) {
       await delay(500);
       const user: User = {
         id: `u_${role}`,

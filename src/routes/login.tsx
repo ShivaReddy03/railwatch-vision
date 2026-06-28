@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrainFront, Eye, EyeOff, Loader2 } from "lucide-react";
+import logo from "../assets/railoptic-logo.png";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -42,8 +43,12 @@ function LoginPage() {
         <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 30% 30%, oklch(0.55 0.16 245 / 0.4), transparent 60%)" }} />
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative">
           <div className="flex items-center gap-3">
-            <div className="size-14 rounded-xl bg-primary/15 border border-primary/30 grid place-items-center">
-              <TrainFront className="size-8 text-primary" />
+            <div className="size-14 rounded-xl bg-primary/15 border border-primary/30 grid place-items-center overflow-hidden">
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <div className="text-3xl font-bold tracking-tight">

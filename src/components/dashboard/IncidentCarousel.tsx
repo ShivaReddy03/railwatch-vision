@@ -3,10 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useAcknowledgeAlert, useEscalateAlert, useExportAlert } from "@/hooks";
+import { toast } from "sonner";
+import type { Alert } from "@/types";
 
 export function IncidentCarousel({ alerts }: { alerts: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [key, setKey] = useState(0);
+  const [selected, setSelected] = useState<Alert | null>(null);
+
+  const ack = useAcknowledgeAlert();
+  const escalate = useEscalateAlert();
+  const exportAlert = useExportAlert();
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % alerts.length);
@@ -136,7 +145,10 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
               </div>
 
               <div className="mt-auto pt-5">
-                <Button className={`w-full ${style.bgSolid} ${style.textSolid}`}>
+                <Button 
+                  className={`w-full ${style.bgSolid} ${style.textSolid}`}
+                  onClick={() => setSelected(alert)}
+                >
                   View Full Details
                 </Button>
               </div>
@@ -144,6 +156,70 @@ export function IncidentCarousel({ alerts }: { alerts: any[] }) {
           </AnimatePresence>
         </div>
       </div>
+
+      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          {selected && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{selected.title || `${selected.objectCategory} at Node ${selected.node}`}</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-4">
+                <img src={selected.imageUrl} alt="" className="w-full h-48 object-cover rounded-lg border border-border" />
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <Field label="Alert ID" value={selected.id} />
+                  <Field label="Severity" value={selected.severity} />
+                  <Field label="Confidence" value={`${selected.confidence}%`} />
+                  <Field label="Status" value={selected.status} />
+                  <Field label="Zone" value={selected.zone || "—"} />
+                  <Field label="Line" value={selected.line || "—"} />
+                  <Field label="Node" value={selected.node || "—"} />
+                  <Field label="Source" value={selected.source || "Camera System"} />
+                  <Field label="Nearest Train" value={selected.nearestTrain || "—"} />
+                  <Field label="Distance" value={selected.distanceKm ? `${selected.distanceKm} km` : "—"} />
+                </div>
+                <div className="flex gap-2 pt-3 border-t border-border">
+                  <Button
+                    className="flex-1"
+                    disabled={ack.isPending}
+                    onClick={() => ack.mutate(selected.id, {
+                      onSuccess: (r) => { toast.success(r.message); setSelected(null); },
+                      onError: () => toast.error("Failed to acknowledge"),
+                    })}
+                  >
+                    {ack.isPending ? "Acknowledging..." : "Acknowledge"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    disabled={escalate.isPending}
+                    onClick={() => {
+                      const note = window.prompt("Escalation note:") || "";
+                      if (!note) return;
+                      escalate.mutate({ id: selected.id, note }, {
+                        onSuccess: (r) => { toast.success(r.message); setSelected(null); },
+                        onError: () => toast.error("Failed to escalate"),
+                      });
+                    }}
+                  >
+                    Escalate
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={exportAlert.isPending}
+                    onClick={() => exportAlert.mutate({ id: selected.id, format: "pdf" }, {
+                      onSuccess: (r) => toast.success(r.message),
+                      onError: () => toast.error("Failed to export"),
+                    })}
+                  >
+                    Export
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -155,4 +231,8 @@ function Metric({ label, value, tone }: { label: string; value: string; tone?: "
       <div className={`text-base font-bold ${tone === "critical" ? "text-critical" : tone === "warning" ? "text-warning" : "text-foreground"}`}>{value}</div>
     </div>
   );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return <div className="border border-border rounded-md p-2"><div className="text-[10px] uppercase text-muted-foreground">{label}</div><div className="font-medium capitalize">{value}</div></div>;
 }

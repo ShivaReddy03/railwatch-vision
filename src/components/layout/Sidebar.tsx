@@ -83,14 +83,6 @@ export function Sidebar() {
             {now.toLocaleDateString("en-US", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })}
           </div>
         </div>
-        <div className="rounded-lg bg-success/10 border border-success/30 p-3">
-          <div className="flex items-center gap-2 text-sm">
-            <Activity className="size-4 text-success" />
-            <span className="text-foreground/90">System Health</span>
-          </div>
-          <div className="text-2xl font-bold text-success mt-1">98%</div>
-          <div className="text-[10px] text-muted-foreground">All Systems Normal</div>
-        </div>
       </div>
     </aside>
   );

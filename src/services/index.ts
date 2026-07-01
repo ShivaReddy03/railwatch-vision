@@ -132,18 +132,6 @@ export const nodeService = {
     return data;
   },
   async summary() {
-    if (USE_MOCK) {
-      await delay(100);
-      const n = filterByRegion(getDataset().nodes, authService.getCurrentUser());
-      return {
-        total: n.length,
-        online: n.filter((x) => x.status !== "offline").length,
-        healthy: n.filter((x) => x.status === "normal").length,
-        warning: n.filter((x) => x.status === "warning").length,
-        critical: n.filter((x) => x.status === "critical").length,
-        offline: n.filter((x) => x.status === "offline").length,
-      };
-    }
     const { data } = await apiClient.get("/nodes/summary");
     return data as { total: number; online: number; healthy: number; warning: number; critical: number; offline: number };
   },
@@ -152,15 +140,6 @@ export const nodeService = {
 // ---------------- DEVICES ----------------
 export const deviceService = {
   async list(params: ListParams = {}): Promise<PaginatedResponse<Device>> {
-    if (USE_MOCK) {
-      await delay(200);
-      let items = getDataset().devices;
-      if (params.search) {
-        const q = params.search.toLowerCase();
-        items = items.filter((d) => d.id.toLowerCase().includes(q) || d.name.toLowerCase().includes(q));
-      }
-      return paginate(items, params.page || 1, params.pageSize || 10);
-    }
     const { data } = await apiClient.get<PaginatedResponse<Device>>("/devices", { params });
     return data;
   },
@@ -190,10 +169,6 @@ export const incidentService = {
 // ---------------- ANALYTICS ----------------
 export const analyticsService = {
   async summary(): Promise<AnalyticsSummary> {
-    if (USE_MOCK) {
-      await delay(250);
-      return buildAnalytics(filterByRegion(getDataset().alerts, authService.getCurrentUser()));
-    }
     const { data } = await apiClient.get<AnalyticsSummary>("/analytics/summary");
     return data;
   },

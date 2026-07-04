@@ -29,7 +29,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-2">
-          <IncidentCarousel alerts={criticalAlerts} />
+          <IncidentCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} />
         </div>
 
         <div className="lg:col-span-3 glass-card rounded-xl p-5">
@@ -38,31 +38,34 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-2">
-          <ImageCarousel alerts={criticalAlerts} />
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:h-[420px]">
+        <div className="lg:col-span-2 min-h-0">
+          <ImageCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} />
         </div>
 
-        <div className="lg:col-span-3 glass-card rounded-xl p-5">
-          <div className="text-sm font-semibold mb-4">Affected Trains</div>
-          <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground">
-              <tr className="text-left border-b border-border">
-                <th className="py-2">Train No.</th><th>Distance</th><th>ETA</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.affectedTrains?.map((t: import("@/types").Train) => (
-                <tr key={t.id} className="border-b border-border/50">
-                  <td className="py-2.5 font-medium">{t.number}</td>
-                  <td>{t.distanceFromIncidentKm} km</td>
-                  <td>{t.etaMin} min</td>
-                  <td><StatusBadge status={t.status} /></td>
+        <div className="lg:col-span-3 glass-card rounded-xl p-5 flex flex-col min-h-0">
+          <div className="text-sm font-semibold mb-4 shrink-0">Affected Trains</div>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <table className="w-full text-sm">
+              <thead className="text-xs text-muted-foreground sticky top-0 bg-card/95 backdrop-blur">
+                <tr className="text-left border-b border-border">
+                  <th className="py-2">Train No.</th><th>Distance</th><th>ETA</th><th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data?.affectedTrains?.map((t: import("@/types").Train) => (
+                  <tr key={t.id} className="border-b border-border/50">
+                    <td className="py-2.5 font-medium">{t.number}</td>
+                    <td>{t.distanceFromIncidentKm} km</td>
+                    <td>{t.etaMin} min</td>
+                    <td><StatusBadge status={t.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+
       </div>
     </AppShell>
 

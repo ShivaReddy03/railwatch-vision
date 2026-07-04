@@ -1,4 +1,4 @@
-import { Bell, LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/app/auth/AuthContext";
 import { useNavigate } from "@tanstack/react-router";
 import { ROLES } from "@/types";
@@ -10,13 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAlertsSummary } from "@/hooks";
 
 export function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { data: summary } = useAlertsSummary();
   const roleLabel = ROLES.find((r) => r.value === user?.role)?.label || user?.role;
+
 
   return (
     <header className="h-16 border-b border-border bg-background/60 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">

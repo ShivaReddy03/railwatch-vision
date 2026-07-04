@@ -25,14 +25,8 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative size-9 grid place-items-center rounded-md hover:bg-accent transition-colors">
-          <Bell className="size-5 text-muted-foreground" />
-          {summary && summary.active > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-critical text-critical-foreground text-[10px] font-bold grid place-items-center">
-              {summary.active}
-            </span>
-          )}
-        </button>
+
+
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-accent transition-colors">

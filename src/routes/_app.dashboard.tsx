@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/cards/StatCard";
-import { AlertTriangle, Network, Train, Activity, Eye } from "lucide-react";
+import { AlertTriangle, Network, Train, Activity } from "lucide-react";
 import { useDashboard, useNodes } from "@/hooks";
 import { RailwayNetwork } from "@/components/railway-network/RailwayNetwork";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -14,6 +15,8 @@ function Dashboard() {
   const { data } = useDashboard();
   const { data: nodes = [] } = useNodes();
   const criticalAlerts = data?.critical || [];
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
 
   return (
     <AppShell title="Operations Dashboard" subtitle="Live overview of the network">

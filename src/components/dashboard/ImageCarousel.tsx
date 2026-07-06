@@ -3,19 +3,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import detectionImg from "@/assets/detection-rock.jpg";
 
-export function ImageCarousel({ alerts }: { alerts: any[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export function ImageCarousel({ alerts, index, onIndexChange }: { alerts: any[]; index?: number; onIndexChange?: (i: number) => void }) {
+  const [internalIndex, setInternalIndex] = useState(0);
+  const currentIndex = index ?? internalIndex;
+  const setIndex = (updater: (prev: number) => number) => {
+    if (onIndexChange) onIndexChange(updater(currentIndex));
+    else setInternalIndex(updater);
+  };
   const [key, setKey] = useState(0);
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % alerts.length);
+    setIndex((prev) => (prev + 1) % alerts.length);
     setKey((k) => k + 1);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + alerts.length) % alerts.length);
+    setIndex((prev) => (prev - 1 + alerts.length) % alerts.length);
     setKey((k) => k + 1);
   };
+
 
   if (!alerts || alerts.length === 0) {
     return (

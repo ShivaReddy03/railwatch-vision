@@ -45,7 +45,7 @@ export function useTrainsSummary() {
   return useQuery({ queryKey: ["trains", "summary"], queryFn: () => trainService.summary() });
 }
 export function useNodes() {
-  return useQuery({ queryKey: ["nodes"], queryFn: () => nodeService.list() });
+  return useQuery({ queryKey: ["nodes"], queryFn: () => nodeService.list(), refetchInterval: 10000 });
 }
 export function useNodesSummary() {
   return useQuery({ queryKey: ["nodes", "summary"], queryFn: () => nodeService.summary() });

@@ -7,6 +7,8 @@ import { RailwayNetwork } from "@/components/railway-network/RailwayNetwork";
 import { StatusBadge } from "@/components/StatusBadge";
 import { IncidentCarousel } from "@/components/dashboard/IncidentCarousel";
 import { ImageCarousel } from "@/components/dashboard/ImageCarousel";
+import { useState } from "react";
+import { AlertDetailSheet } from "@/components/alerts/AlertDetailSheet";
 
 export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard });
 
@@ -14,6 +16,7 @@ function Dashboard() {
   const { data } = useDashboard();
   const { data: nodes = [] } = useNodes();
   const criticalAlerts = data?.critical || [];
+  const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
 
   return (
     <AppShell title="Operations Dashboard" subtitle="Live overview of the network">
@@ -31,7 +34,12 @@ function Dashboard() {
 
         <div className="lg:col-span-3 glass-card rounded-xl p-5">
           <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
-          <RailwayNetwork nodes={nodes} />
+          <RailwayNetwork 
+            nodes={nodes} 
+            onNodeClick={(n) => {
+              if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
+            }} 
+          />
         </div>
       </div>
 
@@ -61,7 +69,8 @@ function Dashboard() {
           </table>
         </div>
       </div>
-    </AppShell>
 
+      <AlertDetailSheet alertId={selectedAlertId} onClose={() => setSelectedAlertId(null)} />
+    </AppShell>
   );
 }

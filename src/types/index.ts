@@ -81,6 +81,8 @@ export interface RailNode {
   powerStatus: "online" | "offline" | "degraded";
   health: number;
   lastSeen: string;
+  currentAlertId?: string | null;
+  activeAlert?: Alert;
 }
 
 export interface Device {

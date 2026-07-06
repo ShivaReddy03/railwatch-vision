@@ -127,7 +127,10 @@ export const trainService = {
 // ---------------- NODES ----------------
 export const nodeService = {
   async list(): Promise<RailNode[]> {
-    if (USE_MOCK) { await delay(150); return filterByRegion(getDataset().nodes, authService.getCurrentUser()); }
+    if (USE_MOCK) {
+      await delay(150);
+      return filterByRegion(getDataset().nodes, authService.getCurrentUser());
+    }
     const { data } = await apiClient.get<RailNode[]>("/nodes");
     return data;
   },

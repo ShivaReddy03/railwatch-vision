@@ -173,6 +173,16 @@ export function getDataset() {
   if (!_nodes) {
     _nodes = generateNodes(500);
     _alerts = generateAlerts(1000);
+    
+    // Attach currentAlertId to nodes and update status based on active alerts
+    _alerts.filter(a => a.status === 'active').forEach(a => {
+       const node = _nodes!.find(n => n.id === a.node);
+       if (node && !node.currentAlertId) {
+          node.currentAlertId = a.id;
+          node.status = a.severity === "critical" ? "critical" : "warning";
+       }
+    });
+
     _trains = generateTrains(500);
     _devices = generateDevices(_nodes);
     _reports = generateReports(128);

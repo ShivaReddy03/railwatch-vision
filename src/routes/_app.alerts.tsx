@@ -1,16 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
-import { useAlerts, useAlertsSummary, useAcknowledgeAlert, useEscalateAlert, useExportAlert } from "@/hooks";
-import { toast } from "sonner";
+import { useAlerts, useAlertsSummary } from "@/hooks";
 import { StatCard } from "@/components/cards/StatCard";
 import { AlertTriangle, AlertCircle, Info, Bell, Search, Filter, Download, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Alert } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDetailSheet } from "@/components/alerts/AlertDetailSheet";
 
 export const Route = createFileRoute("/_app/alerts")({ component: AlertsPage });
 
@@ -23,9 +22,6 @@ function AlertsPage() {
 
   const { data: summary } = useAlertsSummary();
   const { data, isLoading } = useAlerts({ page, pageSize: 10, search, severity, status });
-  const ack = useAcknowledgeAlert();
-  const escalate = useEscalateAlert();
-  const exportAlert = useExportAlert();
 
   return (
     <AppShell title="Alerts" subtitle="Monitor and manage all system alerts">
@@ -102,73 +98,7 @@ function AlertsPage() {
         </div>
       </div>
 
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          {selected && (
-            <>
-              <SheetHeader>
-                <SheetTitle>{selected.title}</SheetTitle>
-              </SheetHeader>
-              <div className="space-y-4 mt-4">
-                <img src={selected.imageUrl} alt="" className="w-full h-48 object-cover rounded-lg border border-border" />
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <Field label="Alert ID" value={selected.id} />
-                  <Field label="Severity" value={selected.severity} />
-                  <Field label="Confidence" value={`${selected.confidence}%`} />
-                  <Field label="Status" value={selected.status} />
-                  <Field label="Zone" value={selected.zone} />
-                  <Field label="Line" value={selected.line} />
-                  <Field label="Node" value={selected.node} />
-                  <Field label="Source" value={selected.source} />
-                  <Field label="Nearest Train" value={selected.nearestTrain || "—"} />
-                  <Field label="Distance" value={`${selected.distanceKm} km`} />
-                </div>
-                <div className="flex gap-2 pt-3 border-t border-border">
-                  <Button
-                    className="flex-1"
-                    disabled={ack.isPending}
-                    onClick={() => ack.mutate(selected.id, {
-                      onSuccess: (r) => { toast.success(r.message); setSelected(null); },
-                      onError: () => toast.error("Failed to acknowledge"),
-                    })}
-                  >
-                    {ack.isPending ? "Acknowledging..." : "Acknowledge"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    disabled={escalate.isPending}
-                    onClick={() => {
-                      const note = window.prompt("Escalation note:") || "";
-                      if (!note) return;
-                      escalate.mutate({ id: selected.id, note }, {
-                        onSuccess: (r) => { toast.success(r.message); setSelected(null); },
-                        onError: () => toast.error("Failed to escalate"),
-                      });
-                    }}
-                  >
-                    Escalate
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={exportAlert.isPending}
-                    onClick={() => exportAlert.mutate({ id: selected.id, format: "pdf" }, {
-                      onSuccess: (r) => toast.success(r.message),
-                      onError: () => toast.error("Failed to export"),
-                    })}
-                  >
-                    Export
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
+      <AlertDetailSheet alertId={selected?.id || null} onClose={() => setSelected(null)} />
     </AppShell>
   );
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return <div className="border border-border rounded-md p-2"><div className="text-[10px] uppercase text-muted-foreground">{label}</div><div className="font-medium capitalize">{value}</div></div>;
 }

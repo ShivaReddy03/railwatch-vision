@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, AlertTriangle, Train, FileText, BarChart3, HardDrive, Settings, Activity, TrainFront } from "lucide-react";
+import { Home, AlertTriangle, BarChart3, HardDrive, Settings, Activity, TrainFront } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/auth/AuthContext";
 import type { Role } from "@/types";
@@ -8,8 +8,6 @@ import logo from "../../assets/railoptic-logo.png";
 const ALL_ITEMS = [
   { to: "/dashboard", label: "Home", icon: Home },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
-  { to: "/trains", label: "Trains", icon: Train },
-  { to: "/reports", label: "Reports", icon: FileText },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/devices", label: "Devices", icon: HardDrive },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -17,10 +15,10 @@ const ALL_ITEMS = [
 
 const ROLE_MENU: Record<Role, string[]> = {
   loco_driver: ["/dashboard", "/alerts", "/settings"],
-  section_controller: ["/dashboard", "/alerts", "/trains", "/reports", "/analytics", "/devices", "/settings"],
-  maintenance: ["/dashboard", "/alerts", "/devices", "/reports", "/settings"],
-  rpf: ["/dashboard", "/alerts", "/trains", "/reports", "/analytics", "/settings"],
-  railway_board: ["/dashboard", "/alerts", "/trains", "/reports", "/analytics", "/devices", "/settings"],
+  section_controller: ["/dashboard", "/alerts", "/analytics", "/devices", "/settings"],
+  maintenance: ["/dashboard", "/alerts", "/devices", "/settings"],
+  rpf: ["/dashboard", "/alerts", "/analytics", "/settings"],
+  railway_board: ["/dashboard", "/alerts", "/analytics", "/devices", "/settings"],
 };
 
 export function Sidebar() {

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import detectionImg from "@/assets/detection-rock.jpg";
 
-export function ImageCarousel({ alerts, index, onIndexChange }: { alerts: any[]; index?: number; onIndexChange?: (i: number) => void }) {
+export function ImageCarousel({ alerts, index, onIndexChange, isPaused }: { alerts: any[]; index?: number; onIndexChange?: (i: number) => void; isPaused?: boolean }) {
   const [internalIndex, setInternalIndex] = useState(0);
   const currentIndex = index ?? internalIndex;
   const setIndex = (updater: (prev: number) => number) => {
@@ -64,7 +64,7 @@ export function ImageCarousel({ alerts, index, onIndexChange }: { alerts: any[];
             opacity="0.15"
           />
           <rect
-            key={key}
+            key={currentIndex}
             x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)"
             rx="11" ry="11"
             fill="none"
@@ -72,7 +72,7 @@ export function ImageCarousel({ alerts, index, onIndexChange }: { alerts: any[];
             strokeWidth="2"
             pathLength="100"
             className="carousel-progress"
-            onAnimationEnd={handleNext}
+            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
           />
         </svg>
       )}

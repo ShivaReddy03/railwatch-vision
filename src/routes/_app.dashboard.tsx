@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { useAuth } from "@/app/auth/AuthContext";
 import { StatCard } from "@/components/cards/StatCard";
 import { AlertTriangle, Network, Train, Activity } from "lucide-react";
 import { useDashboard, useNodes } from "@/hooks";
@@ -15,66 +16,93 @@ export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard }
 function Dashboard() {
   const { data } = useDashboard();
   const { data: nodes = [] } = useNodes();
+  const { user } = useAuth();
+  
+  const isLocoDriver = user?.role === "loco_driver";
+  const displayNodes = isLocoDriver ? nodes.filter(n => n.line === (user?.region || "North Line")) : nodes;
+
   const criticalAlerts = data?.critical || [];
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
 
   return (
     <AppShell title="Operations Dashboard" subtitle="Live overview of the network">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={AlertTriangle} label="Active Alerts" value={data?.activeAlerts ?? "—"} hint={`Critical ${data?.criticalCount ?? 0} • Warning ${data?.warningCount ?? 0}`} tone="critical" />
-        <StatCard icon={Network} label="Total Nodes" value={data?.totalNodes ?? "—"} hint={`Online ${data?.onlineNodes ?? 0}`} tone="info" />
-        <StatCard icon={Train} label="Active Trains" value={data?.activeTrains ?? "—"} hint="On Network" tone="default" />
-        <StatCard icon={Activity} label="System Health" value={`${data?.systemHealth ?? 0}%`} hint="All Systems Normal" tone="success" />
-      </div>
+      {!isLocoDriver && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard icon={AlertTriangle} label="Active Alerts" value={data?.activeAlerts ?? "—"} hint={`Critical ${data?.criticalCount ?? 0} • Warning ${data?.warningCount ?? 0}`} tone="critical" />
+          <StatCard icon={Network} label="Total Nodes" value={data?.totalNodes ?? "—"} hint={`Online ${data?.onlineNodes ?? 0}`} tone="info" />
+          <StatCard icon={Train} label="Active Trains" value={data?.activeTrains ?? "—"} hint="On Network" tone="default" />
+          <StatCard icon={Activity} label="System Health" value={`${data?.systemHealth ?? 0}%`} hint="All Systems Normal" tone="success" />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-2">
-          <IncidentCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} />
+        <div className="lg:col-span-2" onMouseEnter={() => setIsCarouselPaused(true)} onMouseLeave={() => setIsCarouselPaused(false)}>
+          <IncidentCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} isPaused={isCarouselPaused} />
         </div>
 
-        <div className="lg:col-span-3 glass-card rounded-xl p-5">
-          <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
-          <RailwayNetwork
-            nodes={nodes}
-            onNodeClick={(n) => {
-              if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
-            }}
-          />
-        </div>
+        {isLocoDriver ? (
+          <div className="lg:col-span-3 min-h-0" onMouseEnter={() => setIsCarouselPaused(true)} onMouseLeave={() => setIsCarouselPaused(false)}>
+            <ImageCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} isPaused={isCarouselPaused} />
+          </div>
+        ) : (
+          <div className="lg:col-span-3 glass-card rounded-xl p-5">
+            <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
+            <RailwayNetwork
+              nodes={displayNodes}
+              onNodeClick={(n) => {
+                if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:h-[420px]">
-        <div className="lg:col-span-2 min-h-0">
-          <ImageCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} />
-        </div>
-
-        <div className="lg:col-span-3 glass-card rounded-xl p-5 flex flex-col min-h-0">
-          <div className="text-sm font-semibold mb-4 shrink-0">Affected Trains</div>
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <table className="w-full text-sm">
-              <thead className="text-xs text-muted-foreground sticky top-0 bg-card/95 backdrop-blur">
-                <tr className="text-left border-b border-border">
-                  <th className="py-2">Train No.</th><th>Alert ID</th><th>Node ID</th><th>Distance</th><th>ETA</th><th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data?.affectedTrains?.map((t: import("@/types").Train) => (
-                  <tr key={t.id} className="border-b border-border/50">
-                    <td className="py-2.5 font-medium">{t.number}</td>
-                    <td className="font-mono text-xs">{t.alertId || "—"}</td>
-                    <td className="font-mono text-xs">{t.nodeId || "—"}</td>
-                    <td>{t.distanceFromIncidentKm} km</td>
-                    <td>{t.etaMin} min</td>
-                    <td><StatusBadge status={t.status} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {isLocoDriver ? (
+          <div className="lg:col-span-5 glass-card rounded-xl p-5 overflow-y-auto min-h-0">
+            <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
+            <RailwayNetwork
+              nodes={displayNodes}
+              onNodeClick={(n) => {
+                if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
+              }}
+            />
           </div>
-        </div>
+        ) : (
+          <div className="lg:col-span-2 min-h-0" onMouseEnter={() => setIsCarouselPaused(true)} onMouseLeave={() => setIsCarouselPaused(false)}>
+            <ImageCarousel alerts={criticalAlerts} index={carouselIndex} onIndexChange={setCarouselIndex} isPaused={isCarouselPaused} />
+          </div>
+        )}
 
+        {!isLocoDriver && (
+          <div className="lg:col-span-3 glass-card rounded-xl p-5 flex flex-col min-h-0">
+            <div className="text-sm font-semibold mb-4 shrink-0">Affected Trains</div>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <table className="w-full text-sm">
+                <thead className="text-xs text-muted-foreground sticky top-0 bg-card/95 backdrop-blur">
+                  <tr className="text-left border-b border-border">
+                    <th className="py-2">Train No.</th><th>Alert ID</th><th>Node ID</th><th>Distance</th><th>ETA</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.affectedTrains?.map((t: import("@/types").Train) => (
+                    <tr key={t.id} className="border-b border-border/50">
+                      <td className="py-2.5 font-medium">{t.number}</td>
+                      <td className="font-mono text-xs">{t.alertId || "—"}</td>
+                      <td className="font-mono text-xs">{t.nodeId || "—"}</td>
+                      <td>{t.distanceFromIncidentKm} km</td>
+                      <td>{t.etaMin} min</td>
+                      <td><StatusBadge status={t.status} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       <AlertDetailSheet alertId={selectedAlertId} onClose={() => setSelectedAlertId(null)} />

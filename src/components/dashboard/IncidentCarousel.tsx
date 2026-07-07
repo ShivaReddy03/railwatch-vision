@@ -8,7 +8,7 @@ import { useAcknowledgeAlert, useEscalateAlert, useExportAlert } from "@/hooks";
 import { toast } from "sonner";
 import type { Alert } from "@/types";
 
-export function IncidentCarousel({ alerts, index, onIndexChange }: { alerts: any[]; index?: number; onIndexChange?: (i: number) => void }) {
+export function IncidentCarousel({ alerts, index, onIndexChange, isPaused }: { alerts: any[]; index?: number; onIndexChange?: (i: number) => void; isPaused?: boolean }) {
   const [internalIndex, setInternalIndex] = useState(0);
   const currentIndex = index ?? internalIndex;
   const setIndex = (updater: (prev: number) => number) => {
@@ -72,7 +72,11 @@ export function IncidentCarousel({ alerts, index, onIndexChange }: { alerts: any
   const style = toneConfig[alert.severity as keyof typeof toneConfig] || toneConfig.critical;
 
   return (
-    <div className={`relative glass-card rounded-xl overflow-hidden h-full min-h-[360px] flex flex-col group ${style.border}`}>
+    <motion.div 
+      className={`relative glass-card rounded-xl overflow-hidden h-full min-h-[360px] flex flex-col group ${style.border}`}
+      animate={alert.severity === 'critical' ? { scale: [1, 1.015, 1] } : { scale: 1 }}
+      transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+    >
       {hasMultiple && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
           <rect
@@ -92,6 +96,7 @@ export function IncidentCarousel({ alerts, index, onIndexChange }: { alerts: any
             strokeWidth="2"
             pathLength="100"
             className="carousel-progress"
+            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
             onAnimationEnd={handleNext}
           />
         </svg>
@@ -226,7 +231,7 @@ export function IncidentCarousel({ alerts, index, onIndexChange }: { alerts: any
           )}
         </SheetContent>
       </Sheet>
-    </div>
+    </motion.div>
   );
 }
 

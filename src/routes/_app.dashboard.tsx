@@ -56,13 +56,15 @@ function Dashboard() {
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground sticky top-0 bg-card/95 backdrop-blur">
                 <tr className="text-left border-b border-border">
-                  <th className="py-2">Train No.</th><th>Distance</th><th>ETA</th><th>Status</th>
+                  <th className="py-2">Train No.</th><th>Alert ID</th><th>Node ID</th><th>Distance</th><th>ETA</th><th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {data?.affectedTrains?.map((t: import("@/types").Train) => (
                   <tr key={t.id} className="border-b border-border/50">
                     <td className="py-2.5 font-medium">{t.number}</td>
+                    <td className="font-mono text-xs">{t.alertId || "—"}</td>
+                    <td className="font-mono text-xs">{t.nodeId || "—"}</td>
                     <td>{t.distanceFromIncidentKm} km</td>
                     <td>{t.etaMin} min</td>
                     <td><StatusBadge status={t.status} /></td>

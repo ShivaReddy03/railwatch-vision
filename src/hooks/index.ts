@@ -2,13 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { alertsService, trainService, nodeService, deviceService, reportsService, analyticsService, dashboardService, incidentService } from "@/services";
 
 export function useDashboard() {
-  return useQuery({ queryKey: ["dashboard"], queryFn: () => dashboardService.overview(), refetchInterval: 15000 });
+  return useQuery({ queryKey: ["dashboard"], queryFn: () => dashboardService.overview(), refetchInterval: 5000 });
 }
 export function useAlerts(params: Parameters<typeof alertsService.list>[0] = {}) {
-  return useQuery({ queryKey: ["alerts", params], queryFn: () => alertsService.list(params), refetchInterval: 20000 });
+  return useQuery({ queryKey: ["alerts", params], queryFn: () => alertsService.list(params), refetchInterval: 5000 });
 }
 export function useAlertsSummary() {
-  return useQuery({ queryKey: ["alerts", "summary"], queryFn: () => alertsService.summary(), refetchInterval: 15000 });
+  return useQuery({ queryKey: ["alerts", "summary"], queryFn: () => alertsService.summary(), refetchInterval: 5000 });
 }
 export function useAlert(id: string | undefined) {
   return useQuery({ queryKey: ["alert", id], queryFn: () => alertsService.getById(id!), enabled: !!id });
@@ -39,13 +39,13 @@ export function useExportAlert() {
   });
 }
 export function useTrains(params: Parameters<typeof trainService.list>[0] = {}) {
-  return useQuery({ queryKey: ["trains", params], queryFn: () => trainService.list(params), refetchInterval: 20000 });
+  return useQuery({ queryKey: ["trains", params], queryFn: () => trainService.list(params), refetchInterval: 5000 });
 }
 export function useTrainsSummary() {
   return useQuery({ queryKey: ["trains", "summary"], queryFn: () => trainService.summary() });
 }
 export function useNodes() {
-  return useQuery({ queryKey: ["nodes"], queryFn: () => nodeService.list(), refetchInterval: 10000 });
+  return useQuery({ queryKey: ["nodes"], queryFn: () => nodeService.list(), refetchInterval: 5000 });
 }
 export function useNodesSummary() {
   return useQuery({ queryKey: ["nodes", "summary"], queryFn: () => nodeService.summary() });

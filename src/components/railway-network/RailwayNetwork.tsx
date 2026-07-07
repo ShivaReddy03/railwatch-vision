@@ -36,7 +36,7 @@ export function RailwayNetwork({ nodes, onNodeClick }: Props) {
           <div className="relative">
             <div className="absolute top-1/2 left-0 right-0 h-px bg-border" />
             <div className="relative flex justify-between items-center px-2">
-              {ns.slice(0, 8).map((n) => (
+              {ns.slice(0, 10).map((n) => (
                 <button
                   key={n.id}
                   onClick={() => onNodeClick?.(n)}

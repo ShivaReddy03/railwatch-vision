@@ -58,6 +58,8 @@ export interface Train {
   line: string;
   from: string;
   to: string;
+  alertId?: string | null;
+  nodeId?: string | null;
   currentLocation: string;
   destination: string;
   speedKmh: number | null;

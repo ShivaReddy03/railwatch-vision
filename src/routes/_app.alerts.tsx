@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { useAlerts, useAlertsSummary, useAcknowledgeAlert, useEscalateAlert, useExportAlert } from "@/hooks";
+import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import { StatCard } from "@/components/cards/StatCard";
 import { AlertTriangle, AlertCircle, Info, Bell, Search, Filter, Download, Eye } from "lucide-react";
@@ -21,8 +22,10 @@ function AlertsPage() {
   const [status, setStatus] = useState("all");
   const [selected, setSelected] = useState<Alert | null>(null);
 
+  const debouncedSearch = useDebounce(search, 300);
+
   const { data: summary } = useAlertsSummary();
-  const { data, isLoading } = useAlerts({ page, pageSize: 10, search, severity, status });
+  const { data, isLoading } = useAlerts({ page, pageSize: 10, search: debouncedSearch, severity, status });
   const ack = useAcknowledgeAlert();
   const escalate = useEscalateAlert();
   const exportAlert = useExportAlert();

@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
+import favicon from "../assets/favicon.ico";
 import { AuthProvider } from "../app/auth/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,7 +19,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "RailOptic — AI-Powered Railway Object Detection" },
       { name: "description", content: "Enterprise dashboard for real-time railway obstruction detection, incident response, and network health monitoring." },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "icon", type: "image/x-icon", href: favicon },
+      { rel: "stylesheet", href: appCss }
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

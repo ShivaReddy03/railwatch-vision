@@ -28,7 +28,11 @@ function LoginPage() {
     try {
       await login(username, password, role);
       toast.success("Welcome back!");
-      navigate({ to: "/dashboard" });
+      if (role === "rpf" || role === "maintenance") {
+        navigate({ to: "/action-desk" });
+      } else {
+        navigate({ to: "/dashboard" });
+      }
     } catch {
       toast.error("Login failed");
     } finally {

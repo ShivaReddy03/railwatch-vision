@@ -19,6 +19,7 @@ import { Route as AppDevicesRouteImport } from './routes/_app.devices'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppAnalyticsRouteImport } from './routes/_app.analytics'
 import { Route as AppAlertsRouteImport } from './routes/_app.alerts'
+import { Route as AppActionDeskRouteImport } from './routes/_app.action-desk'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -69,10 +70,16 @@ const AppAlertsRoute = AppAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppActionDeskRoute = AppActionDeskRouteImport.update({
+  id: '/action-desk',
+  path: '/action-desk',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/action-desk': typeof AppActionDeskRoute
   '/alerts': typeof AppAlertsRoute
   '/analytics': typeof AppAnalyticsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/action-desk': typeof AppActionDeskRoute
   '/alerts': typeof AppAlertsRoute
   '/analytics': typeof AppAnalyticsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/action-desk': typeof AppActionDeskRoute
   '/_app/alerts': typeof AppAlertsRoute
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/action-desk'
     | '/alerts'
     | '/analytics'
     | '/dashboard'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/action-desk'
     | '/alerts'
     | '/analytics'
     | '/dashboard'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/login'
+    | '/_app/action-desk'
     | '/_app/alerts'
     | '/_app/analytics'
     | '/_app/dashboard'
@@ -220,10 +232,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/action-desk': {
+      id: '/_app/action-desk'
+      path: '/action-desk'
+      fullPath: '/action-desk'
+      preLoaderRoute: typeof AppActionDeskRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppActionDeskRoute: typeof AppActionDeskRoute
   AppAlertsRoute: typeof AppAlertsRoute
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppDashboardRoute: typeof AppDashboardRoute
@@ -234,6 +254,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppActionDeskRoute: AppActionDeskRoute,
   AppAlertsRoute: AppAlertsRoute,
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppDashboardRoute: AppDashboardRoute,

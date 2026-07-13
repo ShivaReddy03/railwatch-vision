@@ -46,6 +46,9 @@ export interface Alert {
   etaSec?: number;
   imageUrl?: string;
   riskScore?: number;
+  escalatedTo?: string | null;
+  escalatedAt?: string | null;
+  escalatedBy?: number | null;
 }
 
 export type TrainStatus = "safe" | "monitor" | "at_risk" | "delayed" | "on_time";

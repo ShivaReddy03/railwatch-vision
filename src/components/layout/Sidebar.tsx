@@ -7,6 +7,7 @@ import logo from "../../assets/railoptic-logo.png";
 
 const ALL_ITEMS = [
   { to: "/dashboard", label: "Home", icon: Home },
+  { to: "/action-desk", label: "Action Desk", icon: Activity },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/devices", label: "Devices", icon: HardDrive },
@@ -16,8 +17,8 @@ const ALL_ITEMS = [
 const ROLE_MENU: Record<Role, string[]> = {
   loco_driver: ["/dashboard", "/alerts", "/settings"],
   section_controller: ["/dashboard", "/alerts", "/analytics", "/devices", "/settings"],
-  maintenance: ["/dashboard", "/alerts", "/devices", "/settings"],
-  rpf: ["/dashboard", "/alerts", "/analytics", "/settings"],
+  maintenance: ["/action-desk", "/settings"],
+  rpf: ["/action-desk", "/settings"],
   railway_board: ["/dashboard", "/alerts", "/analytics", "/devices", "/settings"],
 };
 

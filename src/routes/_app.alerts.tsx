@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import type { Alert } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -20,12 +24,17 @@ function AlertsPage() {
   const [search, setSearch] = useState("");
   const [severity, setSeverity] = useState("all");
   const [status, setStatus] = useState("all");
+  const [escalatedTo, setEscalatedTo] = useState("all");
   const [selected, setSelected] = useState<Alert | null>(null);
+
+  const [isEscalateOpen, setIsEscalateOpen] = useState(false);
+  const [escalateTeam, setEscalateTeam] = useState("");
+  const [escalateNote, setEscalateNote] = useState("");
 
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: summary } = useAlertsSummary();
-  const { data, isLoading } = useAlerts({ page, pageSize: 10, search: debouncedSearch, severity, status });
+  const { data, isLoading } = useAlerts({ page, pageSize: 10, search: debouncedSearch, severity, status, escalated_to: escalatedTo });
   const ack = useAcknowledgeAlert();
   const escalate = useEscalateAlert();
   const exportAlert = useExportAlert();
@@ -63,6 +72,16 @@ function AlertsPage() {
               <SelectItem value="resolved">Resolved</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={escalatedTo} onValueChange={(v) => { setEscalatedTo(v); setPage(1); }}>
+            <SelectTrigger className="w-36"><SelectValue placeholder="Escalation" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Alerts</SelectItem>
+              <SelectItem value="none">Not Escalated</SelectItem>
+              <SelectItem value="rpf">Escalated to RPF</SelectItem>
+              <SelectItem value="maintenance">Escalated to Maintenance</SelectItem>
+              <SelectItem value="both">Escalated to Both</SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline" size="sm"><Filter className="size-4 mr-1" />Filter</Button>
           <Button variant="outline" size="sm"><Download className="size-4 mr-1" />Export</Button>
         </div>
@@ -71,11 +90,11 @@ function AlertsPage() {
           <table className="w-full text-sm">
             <thead className="text-xs text-muted-foreground border-b border-border">
               <tr className="text-left">
-                <th className="py-3 px-2">Alert ID</th><th>Type</th><th>Severity</th><th>Title</th><th>Source</th><th>Location</th><th>Time</th><th>Status</th><th></th>
+                <th className="py-3 px-2">Alert ID</th><th>Type</th><th>Severity</th><th>Title</th><th>Source</th><th>Location</th><th>Time</th><th>Status</th><th>Escalated To</th><th></th>
               </tr>
             </thead>
             <tbody>
-              {isLoading && <tr><td colSpan={9} className="py-8 text-center text-muted-foreground">Loading...</td></tr>}
+              {isLoading && <tr><td colSpan={10} className="py-8 text-center text-muted-foreground">Loading...</td></tr>}
               {data?.data.map((a) => (
                 <tr key={a.id} className="border-b border-border/50 hover:bg-accent/30 cursor-pointer" onClick={() => setSelected(a)}>
                   <td className="py-3 px-2 font-mono text-xs">{a.id}</td>
@@ -86,6 +105,7 @@ function AlertsPage() {
                   <td className="text-muted-foreground">{a.location}</td>
                   <td className="text-muted-foreground"><div>{a.time}</div><div className="text-[10px]">{a.date}</div></td>
                   <td><StatusBadge status={a.status} /></td>
+                  <td>{a.escalatedTo ? <Badge variant="outline" className="uppercase text-[10px]">{a.escalatedTo}</Badge> : <span className="text-muted-foreground text-xs">—</span>}</td>
                   <td><Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setSelected(a); }}><Eye className="size-4" /></Button></td>
                 </tr>
               ))}
@@ -125,6 +145,12 @@ function AlertsPage() {
                   <Field label="Source" value={selected.source} />
                   <Field label="Nearest Train" value={selected.nearestTrain || "—"} />
                   <Field label="Distance" value={`${selected.distanceKm} km`} />
+                  {selected.escalatedTo && (
+                    <>
+                      <Field label="Escalated To" value={selected.escalatedTo.toUpperCase()} />
+                      <Field label="Escalated At" value={selected.escalatedAt ? new Date(selected.escalatedAt).toLocaleString() : "—"} />
+                    </>
+                  )}
                 </div>
                 <div className="flex gap-2 pt-3 border-t border-border">
                   <Button
@@ -140,15 +166,8 @@ function AlertsPage() {
                   <Button
                     variant="outline"
                     className="flex-1"
-                    disabled={escalate.isPending}
-                    onClick={() => {
-                      const note = window.prompt("Escalation note:") || "";
-                      if (!note) return;
-                      escalate.mutate({ id: selected.id, note }, {
-                        onSuccess: (r) => { toast.success(r.message); setSelected(null); },
-                        onError: () => toast.error("Failed to escalate"),
-                      });
-                    }}
+                    disabled={escalate.isPending || !!selected.escalatedTo}
+                    onClick={() => setIsEscalateOpen(true)}
                   >
                     Escalate
                   </Button>
@@ -168,6 +187,60 @@ function AlertsPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      <Dialog open={isEscalateOpen} onOpenChange={setIsEscalateOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Escalate Alert</DialogTitle>
+            <DialogDescription>
+              Route this alert to a specialized team for immediate action.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Target Team</Label>
+              <Select value={escalateTeam} onValueChange={setEscalateTeam}>
+                <SelectTrigger><SelectValue placeholder="Select team" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rpf">Railway Protection Force (RPF)</SelectItem>
+                  <SelectItem value="maintenance">Maintenance Team</SelectItem>
+                  <SelectItem value="both">Both (RPF & Maintenance)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label>Note (Optional)</Label>
+              <Textarea
+                placeholder="Add context or instructions for the team..."
+                value={escalateNote}
+                onChange={(e) => setEscalateNote(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEscalateOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!escalateTeam || escalate.isPending}
+              onClick={() => {
+                if (selected) {
+                  escalate.mutate({ id: selected.id, targetTeam: escalateTeam, note: escalateNote }, {
+                    onSuccess: (r) => {
+                      toast.success(r.message);
+                      setIsEscalateOpen(false);
+                      setEscalateTeam("");
+                      setEscalateNote("");
+                      setSelected(null);
+                    },
+                    onError: () => toast.error("Failed to escalate"),
+                  });
+                }
+              }}
+            >
+              {escalate.isPending ? "Escalating..." : "Confirm Escalation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }

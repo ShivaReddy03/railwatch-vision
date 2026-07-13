@@ -45,7 +45,7 @@ export const authService = {
   },
 };
 
-interface ListParams { page?: number; pageSize?: number; search?: string; status?: string; zone?: string; line?: string; severity?: string }
+interface ListParams { page?: number; pageSize?: number; search?: string; status?: string; zone?: string; line?: string; severity?: string; escalated_to?: string }
 
 function filterByRegion<T extends { zone?: string }>(items: T[], user: User | null): T[] {
   if (!user) return items;
@@ -99,9 +99,9 @@ export const alertsService = {
     const { data } = await apiClient.post<{ message: string }>(`/alerts/${id}/acknowledge`);
     return data;
   },
-  async escalate(id: string, note: string): Promise<{ message: string; note: string }> {
+  async escalate(id: string, targetTeam: string, note?: string): Promise<{ message: string; note?: string }> {
     if (USE_MOCK) { await delay(150); return { message: "Alert escalated", note }; }
-    const { data } = await apiClient.post<{ message: string; note: string }>(`/alerts/${id}/escalate`, { note });
+    const { data } = await apiClient.post<{ message: string; note?: string }>(`/alerts/${id}/escalate`, { escalated_to: targetTeam, note });
     return data;
   },
   async exportAlert(id: string, format: "pdf" | "csv" = "pdf"): Promise<{ message: string }> {

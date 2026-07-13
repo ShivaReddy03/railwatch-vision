@@ -26,7 +26,7 @@ export function useAcknowledgeAlert() {
 export function useEscalateAlert() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, note }: { id: string; note: string }) => alertsService.escalate(id, note),
+    mutationFn: ({ id, targetTeam, note }: { id: string; targetTeam: string; note?: string }) => alertsService.escalate(id, targetTeam, note),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["alerts"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });

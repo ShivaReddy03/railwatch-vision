@@ -79,7 +79,6 @@ function AlertsPage() {
               <SelectItem value="none">Not Escalated</SelectItem>
               <SelectItem value="rpf">Escalated to RPF</SelectItem>
               <SelectItem value="maintenance">Escalated to Maintenance</SelectItem>
-              <SelectItem value="both">Escalated to Both</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm"><Filter className="size-4 mr-1" />Filter</Button>
@@ -204,7 +203,6 @@ function AlertsPage() {
                 <SelectContent>
                   <SelectItem value="rpf">Railway Protection Force (RPF)</SelectItem>
                   <SelectItem value="maintenance">Maintenance Team</SelectItem>
-                  <SelectItem value="both">Both (RPF & Maintenance)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

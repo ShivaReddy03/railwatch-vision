@@ -108,7 +108,6 @@ export function AlertDetailSheet({ alertId, onClose }: AlertDetailSheetProps) {
                 <SelectContent>
                   <SelectItem value="rpf">Railway Protection Force (RPF)</SelectItem>
                   <SelectItem value="maintenance">Maintenance Team</SelectItem>
-                  <SelectItem value="both">Both (RPF & Maintenance)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { IncidentCarousel } from "@/components/dashboard/IncidentCarousel";
 import { ImageCarousel } from "@/components/dashboard/ImageCarousel";
 import { AlertDetailSheet } from "@/components/alerts/AlertDetailSheet";
+import { NodesMapDialog } from "@/components/dashboard/NodesMapDialog";
 
 export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard });
 
@@ -49,7 +50,15 @@ function Dashboard() {
           </div>
         ) : (
           <div className="lg:col-span-3 glass-card rounded-xl p-5">
-            <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-semibold">Track Monitoring Overview</div>
+              <NodesMapDialog
+                nodes={displayNodes}
+                onNodeClick={(n) => {
+                  if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
+                }}
+              />
+            </div>
             <RailwayNetwork
               nodes={displayNodes}
               onNodeClick={(n) => {
@@ -63,7 +72,15 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:h-[420px]">
         {isLocoDriver ? (
           <div className="lg:col-span-5 glass-card rounded-xl p-5 overflow-y-auto min-h-0">
-            <div className="text-sm font-semibold mb-4">Track Monitoring Overview</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-semibold">Track Monitoring Overview</div>
+              <NodesMapDialog
+                nodes={displayNodes}
+                onNodeClick={(n) => {
+                  if (n.currentAlertId) setSelectedAlertId(n.currentAlertId);
+                }}
+              />
+            </div>
             <RailwayNetwork
               nodes={displayNodes}
               onNodeClick={(n) => {

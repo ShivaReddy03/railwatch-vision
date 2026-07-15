@@ -18,7 +18,7 @@ interface NodesMapProps {
 
 export default function NodesMap({ nodes, onNodeClick }: NodesMapProps) {
   const center = useMemo(() => {
-    if (nodes.length === 0) return [20.5937, 78.9629] as [number, number];
+    if (nodes.length === 0) return [10.8505, 76.2711] as [number, number]; // Default to Kerala
     const lats = nodes.map((n) => n.gps.lat);
     const lngs = nodes.map((n) => n.gps.lng);
     const minLat = Math.min(...lats);
@@ -39,7 +39,15 @@ export default function NodesMap({ nodes, onNodeClick }: NodesMapProps) {
   };
 
   return (
-    <MapContainer center={center} zoom={6} className="w-full h-full z-0" scrollWheelZoom={true}>
+    <MapContainer 
+      center={center} 
+      zoom={8} 
+      minZoom={7}
+      maxBounds={[[8.0, 74.5], [13.0, 78.0]]}
+      maxBoundsViscosity={1.0}
+      className="w-full h-full z-0" 
+      scrollWheelZoom={true}
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
